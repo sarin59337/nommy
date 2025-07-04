@@ -1,0 +1,28 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "bootstrap-sha": "c5b97d5ae6c19d502c3c342affda20a53e96e8f8",
+  "release-type": "node",
+  "packages": {
+    "": {
+      "release-type": "node",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true,
+      "draft": false,
+      "prerelease": false,
+      "component": "nommy-project",
+      "package-name": "nommy-project",
+      "version-file": "package.json"
+    }
+  },
+  "plugins": [
+    {
+      "type": "node-workspace",
+      "merge": false
+    },
+    {
+      "type": "linked-versions",
+      "group-name": "all",
+      "components": ["."]
+    }
+  ]
+}

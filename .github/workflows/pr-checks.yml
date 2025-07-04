@@ -1,0 +1,62 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test:
+    name: Test and Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm build
+
+      - name: Check formatting
+        run: pnpm format --check
+
+      - name: Check for ungenerated code
+        run: |
+          # Check for uncommitted changes in working directory
+          if ! git diff --exit-code; then
+            echo "Error: There are uncommitted changes after running build/generate"
+            echo "Please run 'pnpm build' and commit the changes"
+            exit 1
+          fi
+
+          # Check for staged changes
+          if ! git diff --cached --exit-code; then
+            echo "Error: There are staged but uncommitted changes"
+            echo "Please commit your changes"
+            exit 1
+          fi
+
+  check-commits:
+    name: Check Commit Messages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check commit messages
+        uses: wagoid/commitlint-github-action@v5
+        with:
+          configFile: commitlint.config.js
